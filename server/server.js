@@ -90,34 +90,53 @@ function getSiteContext(req) {
   // 1. Check production base domain from env
   const baseDomain = process.env.SPARK_BASE_DOMAIN || process.env.QUICK_BASE_DOMAIN;
   if (baseDomain && hostname.endsWith(`.${baseDomain}`)) {
-    const subdomain = hostname.slice(0, -(baseDomain.length + 1));
+    let subdomain = hostname.slice(0, -(baseDomain.length + 1));
     if (subdomain && subdomain !== 'www') {
+      if (subdomain.endsWith('-spark')) {
+        subdomain = subdomain.slice(0, -6);
+      }
       return subdomain;
     }
   }
   
-  // 2. Check subdomain: e.g. mysite.localhost or mysite.spark.local
+  // 2. Check subdomain: e.g. mysite-spark.localhost or mysite.localhost
   if (parts.length > 1 && (parts[parts.length - 1] === 'localhost' || hostname.endsWith('.local'))) {
-    if (parts.length === 2 && parts[1] === 'localhost' && parts[0] !== 'www') {
-      return parts[0];
-    }
+    let subdomain = parts[0];
     if (parts.length > 2 && parts[0] !== 'www') {
-      return parts[0];
+      subdomain = parts[0];
+    }
+    if (subdomain && subdomain !== 'www') {
+      if (subdomain.endsWith('-spark')) {
+        subdomain = subdomain.slice(0, -6);
+      }
+      return subdomain;
     }
   }
   
   // 3. Check query param or header (for CLI or explicit requests)
   if (req.query.site) {
-    return req.query.site;
+    let siteId = req.query.site;
+    if (siteId.endsWith('-spark')) {
+      siteId = siteId.slice(0, -6);
+    }
+    return siteId;
   }
   if (req.headers['x-spark-site'] || req.headers['x-quick-site']) {
-    return req.headers['x-spark-site'] || req.headers['x-quick-site'];
+    let siteId = req.headers['x-spark-site'] || req.headers['x-quick-site'];
+    if (siteId.endsWith('-spark')) {
+      siteId = siteId.slice(0, -6);
+    }
+    return siteId;
   }
   
   // 4. Check path route /sites/:site/...
   const pathMatch = req.url.match(/^\/sites\/([^/]+)/);
   if (pathMatch) {
-    return pathMatch[1];
+    let siteId = pathMatch[1];
+    if (siteId.endsWith('-spark')) {
+      siteId = siteId.slice(0, -6);
+    }
+    return siteId;
   }
   
   return null;
@@ -184,9 +203,16 @@ app.get('/', (req, res, next) => {
 
 // --- 1. DEPLOYMENT ENDPOINT (CLI) ---
 app.post('/_spark/api/deploy', upload.single('archive'), (req, res) => {
-  const siteId = req.query.site;
+  let siteId = req.query.site;
+  if (siteId && siteId.endsWith('-spark')) {
+    siteId = siteId.slice(0, -6);
+  }
   if (!siteId || !/^[a-z0-9-]+$/.test(siteId)) {
     return res.status(400).json({ error: 'Invalid site name. Use alphanumeric characters and dashes.' });
+  }
+  const reservedNames = ['www', 'spark', 'api', 'dashboard', 'admin', 'installer'];
+  if (reservedNames.includes(siteId)) {
+    return res.status(400).json({ error: `The site name "${siteId}" is reserved.` });
   }
   
   if (!req.file) {
@@ -239,10 +265,10 @@ function getSiteUrls(req, siteId) {
   if (baseDomain) {
     const hasPort = hostParts.length > 1;
     const portPart = hasPort ? `:${hostParts[1]}` : '';
-    domainUrl = `${proto}://${siteId}.${baseDomain}${portPart}`;
+    domainUrl = `${proto}://${siteId}-spark.${baseDomain}${portPart}`;
   } else {
     const port = hostParts.length > 1 ? hostParts[1] : (proto === 'https' ? '443' : '80');
-    domainUrl = `${proto}://${siteId}.localhost:${port}`;
+    domainUrl = `${proto}://${siteId}-spark.localhost:${port}`;
   }
   
   const pathUrl = `${proto}://${host}/sites/${siteId}/index.html`;
