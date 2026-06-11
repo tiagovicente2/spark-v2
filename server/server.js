@@ -50,6 +50,16 @@ db.exec(`
     details TEXT,
     timestamp TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS profiles (
+    email TEXT PRIMARY KEY,
+    name TEXT,
+    role TEXT,
+    team TEXT,
+    slack TEXT,
+    avatar TEXT,
+    updated_at TEXT
+  );
 `);
 
 // Helper to add logs
@@ -113,22 +123,10 @@ function getSiteContext(req) {
   return null;
 }
 
-// --- IDENTITY SIMULATION MIDDLEWARE ---
-// Simulates Identity-Aware Proxy (IAP) headers
+// --- IDENTITY PROXY & SIMULATION MIDDLEWARE ---
+// Resolves identity from Cloudflare Access headers, Google IAP, or fallback cookies
 app.use((req, res, next) => {
-  // We look for a cookie, otherwise use default
-  const authCookie = req.headers.cookie?.split('; ')?.find(row => row.startsWith('spark_user='))?.split('=')[1];
-  
-  if (authCookie) {
-    try {
-      req.user = JSON.parse(decodeURIComponent(authCookie));
-    } catch {
-      req.user = getDefaultUser();
-    }
-  } else {
-    req.user = getDefaultUser();
-  }
-  
+  req.user = resolveUser(req.headers);
   next();
 });
 
@@ -281,15 +279,33 @@ app.post('/_spark/api/identity/login', (req, res) => {
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required' });
   }
+  
   const user = {
-    id: 'user_' + crypto.randomBytes(4).toString('hex'),
+    id: 'user_' + crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex').slice(0, 8),
     name,
-    email,
+    email: email.toLowerCase().trim(),
     role: role || 'Explorer',
     team: team || 'Spark Team',
     slack: slack || `@${name.toLowerCase().replace(/\s+/g, '')}`,
-    avatar: avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80'
+    avatar: avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00f2fe&color=000&bold=true`
   };
+  
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO profiles (email, name, role, team, slack, avatar, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET
+        name=excluded.name,
+        role=excluded.role,
+        team=excluded.team,
+        slack=excluded.slack,
+        avatar=excluded.avatar,
+        updated_at=excluded.updated_at
+    `);
+    stmt.run(user.email, user.name, user.role, user.team, user.slack, user.avatar, new Date().toISOString());
+  } catch (err) {
+    console.error('Error saving profile to DB:', err);
+  }
   
   res.cookie('spark_user', JSON.stringify(user), { maxAge: 1000 * 60 * 60 * 24 * 365, path: '/' });
   res.json({ success: true, user });
@@ -678,7 +694,7 @@ wss.on('connection', (ws, req) => {
     rooms: new Set(),
     dbSubscriptions: new Set(),
     id: 'client_' + crypto.randomBytes(4).toString('hex'),
-    user: getUserFromCookies(req.headers.cookie)
+    user: resolveUser(req.headers)
   };
   
   clients.set(ws, clientInfo);
@@ -732,14 +748,65 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-function getUserFromCookies(cookieHeader) {
-  if (!cookieHeader) return getDefaultUser();
-  const authCookie = cookieHeader.split('; ')?.find(row => row.startsWith('spark_user='))?.split('=')[1];
-  if (authCookie) {
+function resolveUser(headers) {
+  const headerEmail = 
+    headers['cf-access-authenticated-user-email'] || 
+    headers['x-goog-authenticated-user-email'] || 
+    headers['x-spark-user-email'];
+    
+  if (headerEmail) {
+    const email = headerEmail.toLowerCase().trim();
     try {
-      return JSON.parse(decodeURIComponent(authCookie));
-    } catch {}
+      const stmt = db.prepare('SELECT * FROM profiles WHERE email = ?');
+      const row = stmt.get(email);
+      if (row) {
+        return {
+          id: 'user_' + crypto.createHash('md5').update(email).digest('hex').slice(0, 8),
+          name: row.name,
+          email: row.email,
+          role: row.role,
+          team: row.team,
+          slack: row.slack,
+          avatar: row.avatar
+        };
+      } else {
+        // Create default profile
+        const prefix = email.split('@')[0];
+        const formattedName = prefix.split(/[\._-]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        
+        const newUser = {
+          id: 'user_' + crypto.createHash('md5').update(email).digest('hex').slice(0, 8),
+          name: formattedName,
+          email,
+          role: 'Developer',
+          team: 'Spark Team',
+          slack: `@${prefix}`,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formattedName)}&background=0D0E15&color=00f2fe&bold=true`
+        };
+        
+        const insertStmt = db.prepare(`
+          INSERT INTO profiles (email, name, role, team, slack, avatar, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `);
+        insertStmt.run(newUser.email, newUser.name, newUser.role, newUser.team, newUser.slack, newUser.avatar, new Date().toISOString());
+        
+        return newUser;
+      }
+    } catch (err) {
+      console.error('Error resolving user from headers:', err);
+    }
   }
+
+  const cookieHeader = headers.cookie;
+  if (cookieHeader) {
+    const authCookie = cookieHeader.split('; ')?.find(row => row.startsWith('spark_user='))?.split('=')[1];
+    if (authCookie) {
+      try {
+        return JSON.parse(decodeURIComponent(authCookie));
+      } catch {}
+    }
+  }
+
   return getDefaultUser();
 }
 
