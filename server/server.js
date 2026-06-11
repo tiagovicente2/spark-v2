@@ -148,6 +148,23 @@ function getSiteContext(req) {
     }
   }
   
+  // 6. Check Referer header (e.g. when SDK spark.js is requested by path-routed sites)
+  const referer = req.headers.referer;
+  if (referer) {
+    try {
+      const refUrl = new URL(referer);
+      if (refUrl.host === host) {
+        const firstSegment = refUrl.pathname.split('/')[1];
+        if (firstSegment && !['_spark', 'install.sh', 'sites'].includes(firstSegment)) {
+          const sitePath = path.join(sitesDir, firstSegment);
+          if (fs.existsSync(sitePath)) {
+            return firstSegment;
+          }
+        }
+      }
+    } catch (e) {}
+  }
+  
   return null;
 }
 
