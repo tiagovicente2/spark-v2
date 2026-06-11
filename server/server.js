@@ -144,6 +144,49 @@ function getDefaultUser() {
   };
 }
 
+// --- INSTALLER ENDPOINTS ---
+const installScriptPath = path.join(rootDir, 'install.sh');
+
+app.get('/install.sh', (req, res) => {
+  const repo = process.env.SPARK_REPO || 'tiagovicente2/spark-v2';
+  // Use host header to dynamically discover the active Spark server URL
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  const sparkServer = process.env.SPARK_SERVER || `${proto}://${req.headers.host}`;
+
+  try {
+    const template = fs.readFileSync(installScriptPath, 'utf8');
+    const shebang = '#!/usr/bin/env bash\n';
+    let scriptBody = template.startsWith(shebang)
+      ? template.slice(shebang.length)
+      : template;
+
+    let header = `${shebang}`;
+    header += `SPARK_REPO='${repo.replace(/'/g, "'\"'\"'")}'\n`;
+    header += `export SPARK_REPO\n`;
+    header += `SPARK_SERVER='${sparkServer.replace(/'/g, "'\"'\"'")}'\n`;
+    header += `export SPARK_SERVER\n`;
+
+    res.setHeader('Content-Type', 'text/x-shellscript; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    res.send(header + scriptBody);
+  } catch (err) {
+    console.error('Error serving install.sh:', err);
+    res.status(500).send('Error reading installer script');
+  }
+});
+
+// Serve installer on root '/' if requested by curl/wget
+app.get('/', (req, res, next) => {
+  const userAgent = req.headers['user-agent'] || '';
+  if (userAgent.includes('curl') || userAgent.includes('wget') || userAgent.includes('fetch')) {
+    return res.redirect('/install.sh');
+  }
+  next();
+});
+
+// Serve precompiled CLI binaries statically
+app.use('/_spark/dist', express.static(path.join(rootDir, 'dist')));
+
 // --- 1. DEPLOYMENT ENDPOINT (CLI) ---
 app.post('/_spark/api/deploy', upload.single('archive'), (req, res) => {
   const siteId = req.query.site;

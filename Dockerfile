@@ -14,6 +14,8 @@ RUN npm ci --only=production
 
 # Copy application files
 COPY server/ ./server/
+COPY dist/ ./dist/
+COPY install.sh ./install.sh
 
 # Expose server port
 EXPOSE 3000
