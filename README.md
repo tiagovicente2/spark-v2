@@ -194,22 +194,22 @@ The `coolify/installer` directory contains a containerized server that serves ou
 To launch the installer server locally or inside Coolify:
 1. Set the following environment variables:
    - `PORT`: Port to run the server on (default: 3000)
-   - `SPARK_REPO`: GitHub repository to pull compiled releases from (default: `tiagovicente2/spark`)
-   - `SPARK_SERVER`: Your deployed Spark backend URL (e.g. `https://spark.yourdomain.com`). If provided, the installer automatically configures the downloaded CLI to point to this address.
+   - `SPARK_REPO`: GitHub repository to pull compiled releases from (default: `tiagovicente2/spark-v2`)
+   - `SPARK_SERVER`: Your deployed Spark backend URL (e.g. `https://spark.arpgg.io`). If provided, the installer automatically configures the downloaded CLI to point to this address.
 2. Run the installer:
    ```bash
    node coolify/installer/server.js
    ```
 
 ### 3. Install the CLI in One Command
-Once the installer server is deployed (e.g., at `https://spark-installer.yourdomain.com`), developers can install the CLI directly:
+Once the installer server is deployed (e.g., at `https://spark-installer.arpgg.io`), developers can install the CLI directly:
 ```bash
-curl -fsSL https://spark-installer.yourdomain.com | bash
+curl -fsSL https://spark-installer.arpgg.io | bash
 ```
 
 Alternatively, you can run the script manually:
 ```bash
-./install.sh --server https://spark.yourdomain.com
+./install.sh --server https://spark.arpgg.io
 ```
 
 The installer will:

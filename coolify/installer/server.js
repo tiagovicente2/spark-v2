@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const port = Number(process.env.PORT ?? 3000);
-const repo = (process.env.SPARK_REPO ?? 'tiagovicente2/spark').trim();
+const repo = (process.env.SPARK_REPO ?? 'tiagovicente2/spark-v2').trim();
 const sparkServer = (process.env.SPARK_SERVER ?? '').trim();
 const installScriptPath = path.join(__dirname, '..', '..', 'install.sh');
 

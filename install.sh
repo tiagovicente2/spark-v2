@@ -5,7 +5,7 @@ set -eu
 APP_NAME="spark"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 VERSION="latest"
-REPO="${SPARK_REPO:-tiagovicente2/spark}"
+REPO="${SPARK_REPO:-tiagovicente2/spark-v2}"
 SPARK_SERVER="${SPARK_SERVER:-}"
 
 print_usage() {
