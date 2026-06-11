@@ -118,6 +118,22 @@ console.log(`Log in as: ${user.name} (${user.role})`);
 
 ---
 
+## 🌐 Routing & Access Modes
+
+Spark supports two routing modes for serving and accessing your deployed sites:
+
+1. **Direct Path-based Routing (Recommended / Zero-Config)**
+   * **URL Format:** `https://spark.arpgg.io/{site-name}/`
+   * **Why use it:** This is the easiest, zero-config way to access deployments. Since it resides under your primary domain path, it works out-of-the-box on any host (like Coolify) without requiring wildcard DNS setup, custom proxies, or wildcard SSL certificate challenges.
+   * **Client SDK:** The client SDK dynamically resolves site context using the browser's `Referer` headers.
+
+2. **Subdomain-based Routing**
+   * **URL Format:** `https://{site-name}-spark.arpgg.io`
+   * **Why use it:** Provides isolated origin context per site (useful for strict cookie policies).
+   * **Requirements:** Requires a wildcard DNS record (`*`) pointing to your server and a proxy layer (like Traefik) configured with a **DNS challenge** (DNS-01 ACME) for generating wildcard SSL certificates.
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Install & Start Server
