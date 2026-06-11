@@ -259,6 +259,18 @@ function hostPort(req) {
   return parts.length > 1 ? parts[1] : (proto === 'https' ? '443' : '80');
 }
 
+app.get('/_spark/api/debug', (req, res) => {
+  res.json({
+    env: {
+      SPARK_BASE_DOMAIN: process.env.SPARK_BASE_DOMAIN || null,
+      QUICK_BASE_DOMAIN: process.env.QUICK_BASE_DOMAIN || null,
+      NODE_ENV: process.env.NODE_ENV || null,
+      PORT: process.env.PORT || null
+    },
+    headers: req.headers
+  });
+});
+
 // --- 2. IDENTITY APIS ---
 app.get('/_spark/api/identity', (req, res) => {
   res.json(req.user);
