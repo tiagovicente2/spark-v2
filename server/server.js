@@ -217,9 +217,7 @@ app.post('/_spark/api/deploy', upload.single('archive'), (req, res) => {
     
     addLog(siteId, 'deploy', `Website deployed successfully. Size: ${fs.readdirSync(sitePath).length} files.`);
     
-    const port = hostPort(req);
-    const domainUrl = `${req.protocol}://${siteId}.localhost:${port}`;
-    const pathUrl = `${req.protocol}://${req.headers.host}/sites/${siteId}/index.html`;
+    const { domainUrl, pathUrl } = getSiteUrls(req, siteId);
     
     res.json({
       success: true,
@@ -232,10 +230,33 @@ app.post('/_spark/api/deploy', upload.single('archive'), (req, res) => {
   });
 });
 
+function getSiteUrls(req, siteId) {
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers.host || '';
+  const hostParts = host.split(':');
+  
+  const baseDomain = process.env.SPARK_BASE_DOMAIN || process.env.QUICK_BASE_DOMAIN;
+  
+  let domainUrl;
+  if (baseDomain) {
+    const hasPort = hostParts.length > 1;
+    const portPart = hasPort ? `:${hostParts[1]}` : '';
+    domainUrl = `${proto}://${siteId}.${baseDomain}${portPart}`;
+  } else {
+    const port = hostParts.length > 1 ? hostParts[1] : (proto === 'https' ? '443' : '80');
+    domainUrl = `${proto}://${siteId}.localhost:${port}`;
+  }
+  
+  const pathUrl = `${proto}://${host}/sites/${siteId}/index.html`;
+  
+  return { domainUrl, pathUrl };
+}
+
 function hostPort(req) {
   const host = req.headers.host || '';
   const parts = host.split(':');
-  return parts.length > 1 ? parts[1] : (req.protocol === 'https' ? '443' : '80');
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  return parts.length > 1 ? parts[1] : (proto === 'https' ? '443' : '80');
 }
 
 // --- 2. IDENTITY APIS ---
@@ -528,12 +549,13 @@ app.get('/_spark/api/dashboard/metrics', (req, res) => {
         }
         try { walk(fullPath); } catch {}
         
+        const { domainUrl, pathUrl } = getSiteUrls(req, name);
         sitesList.push({
           name,
           deployedAt: stats.mtime,
           fileCount,
-          urlDomain: `${req.protocol}://${name}.localhost:${port}`,
-          urlPath: `${req.protocol}://${req.headers.host}/sites/${name}/index.html`
+          urlDomain: domainUrl,
+          urlPath: pathUrl
         });
       });
     }
