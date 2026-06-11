@@ -188,26 +188,16 @@ The compiled binaries will be saved to the `dist/` directory:
 - `spark-darwin-arm64`
 - `spark-windows-x64.exe`
 
-### 2. Run the Installer Server (Coolify/Docker)
-The `coolify/installer` directory contains a containerized server that serves our `install.sh` script dynamically, pre-configuring client CLIs automatically.
-
-To launch the installer server locally or inside Coolify:
-1. Set the following environment variables:
-   - `PORT`: Port to run the server on (default: 3000)
-   - `SPARK_REPO`: GitHub repository to pull compiled releases from (default: `tiagovicente2/spark-v2`)
-   - `SPARK_SERVER`: Your deployed Spark backend URL (e.g. `https://spark.arpgg.io`). If provided, the installer automatically configures the downloaded CLI to point to this address.
-2. Run the installer:
-   ```bash
-   node coolify/installer/server.js
-   ```
+### 2. Consolidated Installer Script Endpoint
+The main Spark server dynamically serves the `install.sh` script directly from the `/install.sh` route (and redirects from root `/` for user agents like `curl` and `wget`). It automatically pre-configures the downloaded CLI to use the active backend domain and default GitHub repository.
 
 ### 3. Install the CLI in One Command
-Once the installer server is deployed (e.g., at `https://spark-installer.arpgg.io`), developers can install the CLI directly:
+To install the CLI in one command, run:
 ```bash
-curl -fsSL https://spark-installer.arpgg.io | bash
+curl -fsSL https://spark.arpgg.io/install.sh | bash
 ```
 
-Alternatively, you can run the script manually:
+Alternatively, you can run the script manually with parameters:
 ```bash
 ./install.sh --server https://spark.arpgg.io
 ```
