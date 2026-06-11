@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spark - Internal Hosting Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">⚡ SPARK<span>.host</span></div>
+        <div class="version">v1.0.0 (AI Era)</div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="overview">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          Overview
+        </button>
+        <button class="nav-item" data-tab="sites">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Sites Directory
+        </button>
+        <button class="nav-item" data-tab="database">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          Spark DB Explorer
+        </button>
+        <button class="nav-item" data-tab="playground">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          Developer SDK
+        </button>
+      </nav>
+
+      <div class="user-profile-card" id="userProfileCard">
+        <img src="" alt="Avatar" class="user-avatar" id="userAvatar">
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-role" id="userRole">Lead UX Engineer</div>
+          <div class="user-team" id="userTeam">Core Vibe Coding</div>
+        </div>
+        <a href="/_spark/login?next=/_spark/dashboard/" class="btn-change-user" title="Change simulated identity">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- HEADER -->
+      <header class="main-header">
+        <div class="header-title">
+          <h2 id="tabTitle">Overview</h2>
+          <p id="tabSubtitle">Platform health, logs, and activity metrics</p>
+        </div>
+        <div class="header-actions">
+          <div class="server-status-pill">
+            <span class="status-indicator"></span>
+            Server: Connected
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT: OVERVIEW -->
+      <section class="tab-content active" id="tab-overview">
+        <!-- Grid Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon site-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+            <div class="stat-details">
+              <h3 id="statTotalSites">0</h3>
+              <p>Active Deployed Sites</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon db-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+            </div>
+            <div class="stat-details">
+              <h3 id="statTotalDocs">0</h3>
+              <p>Database Documents</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon ws-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="stat-details">
+              <h3 id="statWebsockets">0</h3>
+              <p>Active WebSockets</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon key-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <div class="stat-details">
+              <h3 id="statGemini">Sandbox</h3>
+              <p>AI Engine Proxy Mode</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="overview-content-row">
+          <!-- CLI Instructions -->
+          <div class="content-card cli-instructions-card">
+            <div class="card-header">
+              <h4>Deploy a Site in 10 Seconds</h4>
+              <span class="badge">Vibe Coding Ready</span>
+            </div>
+            <div class="card-body">
+              <p>Spark lets anyone publish sites instantly from their terminal. Open an empty folder, initialize your template, and type deploy:</p>
+              
+              <div class="code-terminal">
+                <div class="terminal-header">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                  <span class="terminal-title">bash</span>
+                </div>
+                <div class="terminal-body">
+                  <div class="line"><span class="prompt">$</span> npm install -g . <span class="comment"># Link CLI tool locally</span></div>
+                  <div class="line"><span class="prompt">$</span> spark init <span class="comment"># Sets up index.html, style.css, app.js</span></div>
+                  <div class="line"><span class="prompt">$</span> spark deploy <span class="input-site-name">my-awesome-site</span></div>
+                  <div class="line output">⚡ Zipping directory...</div>
+                  <div class="line output">⚡ Deploying to Spark platform...</div>
+                  <div class="line output green">✨ Site live! http://my-awesome-site.localhost:3000</div>
+                </div>
+              </div>
+
+              <div class="feature-pills">
+                <span class="pill">⚡ Zero-Config SDK</span>
+                <span class="pill">📂 Automatic Subdomains</span>
+                <span class="pill">🔄 Dynamic Overwrites</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Logs console -->
+          <div class="content-card logs-card">
+            <div class="card-header">
+              <h4>System Event Logs</h4>
+              <button class="btn-text-action" id="btnRefreshLogs">Refresh</button>
+            </div>
+            <div class="card-body console-body" id="consoleLogs">
+              <div class="log-line">No events registered yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT: SITES -->
+      <section class="tab-content" id="tab-sites">
+        <div class="content-card">
+          <div class="card-header">
+            <h4>Sites Directory</h4>
+            <div class="search-bar">
+              <input type="text" id="searchSitesInput" placeholder="Filter sites by name...">
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="sitesTable">
+              <thead>
+                <tr>
+                  <th>Site Domain</th>
+                  <th>Files Count</th>
+                  <th>Deployed Date</th>
+                  <th>Path Fallback Link</th>
+                  <th class="actions-col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" class="table-loading">Loading sites directory...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT: DATABASE -->
+      <section class="tab-content" id="tab-database">
+        <div class="db-explorer-layout">
+          <!-- DB Sidebar -->
+          <div class="db-sidebar">
+            <div class="form-group select-site-group">
+              <label for="dbSiteSelect">Select Site Context</label>
+              <select id="dbSiteSelect" class="form-select">
+                <option value="">-- Choose a Site --</option>
+              </select>
+            </div>
+            
+            <div class="collections-panel">
+              <h5>Collections</h5>
+              <ul class="collections-list" id="dbCollectionsList">
+                <li class="empty-placeholder">Select a site first</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- DB Documents view -->
+          <div class="db-documents-view">
+            <div class="content-card h-full">
+              <div class="card-header db-doc-header">
+                <h4 id="dbDocTitle">Database Documents</h4>
+                <div class="db-actions" id="dbActionsRow" style="display: none;">
+                  <button class="btn btn-primary btn-sm" id="btnNewDoc">Add Document</button>
+                  <button class="btn btn-secondary btn-sm" id="btnRefreshDocs">Refresh</button>
+                </div>
+              </div>
+              
+              <div class="db-documents-list-container">
+                <div class="db-docs-grid" id="dbDocsGrid">
+                  <div class="db-empty-state">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <p>Select a site and collection to browse database entries.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT: PLAYGROUND / DOCS -->
+      <section class="tab-content" id="tab-playground">
+        <div class="playground-layout">
+          <div class="docs-nav">
+            <button class="doc-nav-item active" data-section="doc-db">Database API</button>
+            <button class="doc-nav-item" data-section="doc-identity">Identity API</button>
+            <button class="doc-nav-item" data-section="doc-ai">AI Engine API</button>
+            <button class="doc-nav-item" data-section="doc-ws">WebSockets API</button>
+            <button class="doc-nav-item" data-section="doc-storage">File Storage API</button>
+          </div>
+
+          <div class="docs-content">
+            <!-- DOC: DATABASE -->
+            <div class="doc-section active" id="doc-db">
+              <h3>Database API (Firestore-style)</h3>
+              <p>Spark Database is a collection-based Document Store. It comes with zero-config client write access and real-time subscription mechanisms using WebSockets.</p>
+              
+              <h6>Initialization & Fetching:</h6>
+              <pre class="code-block"><code class="language-javascript">// Reference a collection
+const posts = spark.db.collection('posts');
+
+// Fetch all documents in the collection
+const allPosts = await posts.list();
+console.log(allPosts);</code></pre>
+
+              <h6>Creating, Updating, Deleting:</h6>
+              <pre class="code-block"><code class="language-javascript">// Create a new document (returns created document containing a generated id)
+const newPost = await posts.create({
+  title: 'My First Spark Site',
+  content: 'Having an absolute blast vibe coding!',
+  votes: 1
+});
+
+// Update a document by ID
+await posts.update(newPost.id, { votes: 2 });
+
+// Delete a document by ID
+await posts.delete(newPost.id);</code></pre>
+
+              <h6>Real-Time Synchronization (Subscribing):</h6>
+              <pre class="code-block"><code class="language-javascript">// Setup real-time listeners. Any writes/deletes will immediately trigger these
+const unsubscribe = posts.subscribe({
+  onCreate: (doc) => console.log('Document created:', doc),
+  onUpdate: (doc) => console.log('Document updated:', doc),
+  onDelete: (id) => console.log('Document deleted with ID:', id)
+});
+
+// Stop listening
+unsubscribe();</code></pre>
+            </div>
+
+            <!-- DOC: IDENTITY -->
+            <div class="doc-section" id="doc-identity">
+              <h3>Identity API</h3>
+              <p>Spark integrates with the platform's authentication gateway. Your frontend code knows instantly who is visiting without any login flow or token generation.</p>
+              
+              <h6>Usage:</h6>
+              <pre class="code-block"><code class="language-javascript">// Fetch profile details of the current logged-in employee
+const user = await spark.identity.get();
+
+console.log(user);
+/* Returns:
+{
+  id: "user_dev_alex",
+  name: "Alex Beauchamp",
+  email: "alex.beauchamp@shopify.engineering",
+  role: "Lead UX Engineer",
+  team: "Vibe Coding Labs",
+  slack: "@abeauchamp",
+  avatar: "https://images.unsplash.com/photo-..."
+}
+*/</code></pre>
+            </div>
+
+            <!-- DOC: AI -->
+            <div class="doc-section" id="doc-ai">
+              <h3>AI Engine API (Gemini Client API)</h3>
+              <p>Write client-side AI chat dialogues or generate visuals from a text prompt. The API keys are stored on the Spark server and proxied securely.</p>
+              
+              <h6>Chat Completions:</h6>
+              <pre class="code-block"><code class="language-javascript">// Feed model with conversational thread
+const answer = await spark.ai.chat([
+  { role: 'user', content: 'Generate a short recipe for a developers lunch.' }
+]);
+
+console.log(answer);</code></pre>
+
+              <h6>Visual Prompting (Image Generation):</h6>
+              <pre class="code-block"><code class="language-javascript">// Request image synthesis
+const imageUrl = await spark.ai.generateImage('A neon lit server stack inside a glass vault');
+
+// Render in DOM
+const img = document.createElement('img');
+img.src = imageUrl;
+document.body.appendChild(img);</code></pre>
+            </div>
+
+            <!-- DOC: WEBSOCKETS -->
+            <div class="doc-section" id="doc-ws">
+              <h3>WebSockets API (Multiplayer Rooms)</h3>
+              <p>Spark provides rooms where multiple client nodes can pass websocket events in real time. Perfect for collaborative designs, shared whiteboards, or multiplayer cursors.</p>
+              
+              <h6>Usage:</h6>
+              <pre class="code-block"><code class="language-javascript">// Connect to custom room
+const room = spark.room('game-lobby');
+
+// Broadcast cursor coords to other clients in room
+document.addEventListener('mousemove', (e) => {
+  room.send('cursor-move', { x: e.clientX, y: e.clientY });
+});
+
+// Receive events from other players
+room.on('cursor-move', (data, sender) => {
+  console.log(\`User \${sender.name} moved cursor:\`, data);
+  updateCursorPosition(sender.id, data.x, data.y);
+});
+
+// Cleanup / Leave Room
+room.leave();</code></pre>
+            </div>
+
+            <!-- DOC: STORAGE -->
+            <div class="doc-section" id="doc-storage">
+              <h3>File Storage API</h3>
+              <p>Upload files directly from client side forms and receive public image or resource CDN links.</p>
+              
+              <h6>Usage:</h6>
+              <pre class="code-block"><code class="language-javascript">const fileInput = document.querySelector('input[type="file"]');
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Upload and get URL back
+  const publicUrl = await spark.storage.upload(file);
+  console.log('File available at:', publicUrl);
+});</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL: ADD DOCUMENT -->
+  <div class="modal" id="newDocModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Add Document to Collection</h5>
+        <button class="btn-close" id="btnCloseModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Provide document payload as a JSON object.</p>
+        <div class="form-group">
+          <label for="newDocJson">JSON Content</label>
+          <textarea id="newDocJson" class="form-control code-textarea" rows="8" placeholder='{&#10;  "title": "New Post",&#10;  "content": "Hello world"&#10;}'></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelDoc">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveDoc">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spark Sandbox - Vibe Coding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <header class="app-header">
+      <div class="logo">⚡ SPARK<span>.site</span></div>
+      <div class="badge" id="siteLabel">Loading context...</div>
+    </header>
+
+    <div class="grid">
+      <!-- 1. IDENTITY CARD -->
+      <section class="card glass">
+        <div class="card-title">
+          <span class="icon">👤</span>
+          <h3>spark.identity</h3>
+        </div>
+        <div class="identity-profile" id="profile">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80" alt="Avatar" class="avatar">
+          <div class="profile-details">
+            <h4 id="userName">Alex Beauchamp</h4>
+            <p id="userRole">UX Designer</p>
+            <span class="team-badge" id="userTeam">Core Vibe Labs</span>
+          </div>
+        </div>
+        <div class="action-footer">
+          <a href="/_spark/login" target="_blank" class="btn btn-secondary">Simulate Auth Login</a>
+        </div>
+      </section>
+
+      <!-- 2. DATABASE / GUESTBOOK -->
+      <section class="card glass">
+        <div class="card-title">
+          <span class="icon">📁</span>
+          <h3>spark.db (Live Guestbook)</h3>
+        </div>
+        <div class="guestbook-messages" id="messagesList">
+          <div class="placeholder">No messages posted. Be the first!</div>
+        </div>
+        <form id="commentForm" class="comment-form">
+          <input type="text" id="commentText" placeholder="Write a live synced message..." required>
+          <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+      </section>
+
+      <!-- 3. AI CO-PILOT SANDBOX -->
+      <section class="card glass">
+        <div class="card-title">
+          <span class="icon">🤖</span>
+          <h3>spark.ai (Gemini Proxy)</h3>
+        </div>
+        <div class="ai-chat-console" id="aiOutput">
+          <div class="ai-msg bot">Hello! I am your proxied AI. Ask me anything or trigger the free image generation.</div>
+        </div>
+        <form id="aiForm" class="ai-form">
+          <input type="text" id="aiInput" placeholder="Type a chat prompt..." required>
+          <button type="submit" class="btn btn-primary" id="btnChat">Chat</button>
+          <button type="button" class="btn btn-secondary" id="btnImage">Draw</button>
+        </form>
+      </section>
+
+      <!-- 4. WEBSOCKETS / MULTIPLAYER -->
+      <section class="card glass canvas-card">
+        <div class="card-title">
+          <span class="icon">⚡</span>
+          <h3>spark.room (Multiplayer Cursors)</h3>
+        </div>
+        <div class="multiplayer-canvas" id="canvasArea">
+          <div class="canvas-instructions">Move your cursor around this card. Open this site in another window to see multiplayer syncing!</div>
+          <div id="cursorContainer"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- LOAD ZERO-CONFIG CLIENT SDK -->
+  <script src="/_spark/spark.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

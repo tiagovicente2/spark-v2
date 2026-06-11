@@ -1,0 +1,27 @@
+{
+  "name": "spark",
+  "version": "1.0.0",
+  "description": "A self-hosted clone of Shopify's hosting platform named Spark",
+  "main": "server/server.js",
+  "bin": {
+    "spark": "./cli/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "build:cli:linux-x64": "bun build cli/cli.js --compile --target=bun-linux-x64 --outfile dist/spark-linux-x64",
+    "build:cli:linux-arm64": "bun build cli/cli.js --compile --target=bun-linux-arm64 --outfile dist/spark-linux-arm64",
+    "build:cli:darwin-x64": "bun build cli/cli.js --compile --target=bun-darwin-x64 --outfile dist/spark-darwin-x64",
+    "build:cli:darwin-arm64": "bun build cli/cli.js --compile --target=bun-darwin-arm64 --outfile dist/spark-darwin-arm64",
+    "build:cli:windows-x64": "bun build cli/cli.js --compile --target=bun-windows-x64 --outfile dist/spark-windows-x64.exe",
+    "build:cli:all": "npm run build:cli:linux-x64 && npm run build:cli:linux-arm64 && npm run build:cli:darwin-x64 && npm run build:cli:darwin-arm64 && npm run build:cli:windows-x64"
+  },
+  "dependencies": {
+    "archiver": "^6.0.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "ws": "^8.17.0"
+  }
+}
