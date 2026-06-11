@@ -184,9 +184,6 @@ app.get('/', (req, res, next) => {
   next();
 });
 
-// Serve precompiled CLI binaries statically
-app.use('/_spark/dist', express.static(path.join(rootDir, 'dist')));
-
 // --- 1. DEPLOYMENT ENDPOINT (CLI) ---
 app.post('/_spark/api/deploy', upload.single('archive'), (req, res) => {
   const siteId = req.query.site;

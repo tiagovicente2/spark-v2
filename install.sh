@@ -99,16 +99,10 @@ esac
 
 asset_name="${APP_NAME}-${asset_os}-${asset_arch}"
 
-if [ -n "${SPARK_SERVER:-}" ]; then
-  # Remove trailing slash if present
-  SPARK_SERVER_CLEAN="${SPARK_SERVER%/}"
-  download_url="${SPARK_SERVER_CLEAN}/_spark/dist/${asset_name}"
+if [ "$VERSION" = "latest" ]; then
+  download_url="https://github.com/${REPO}/releases/latest/download/${asset_name}"
 else
-  if [ "$VERSION" = "latest" ]; then
-    download_url="https://github.com/${REPO}/releases/latest/download/${asset_name}"
-  else
-    download_url="https://github.com/${REPO}/releases/download/${VERSION}/${asset_name}"
-  fi
+  download_url="https://github.com/${REPO}/releases/download/${VERSION}/${asset_name}"
 fi
 
 tmp_file="$(mktemp)"
