@@ -1,0 +1,45 @@
+name: Release CLI Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Standalone Binaries
+        run: |
+          mkdir -p dist
+          npm run build:cli:all
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/spark-linux-x64
+            dist/spark-linux-arm64
+            dist/spark-darwin-x64
+            dist/spark-darwin-arm64
+            dist/spark-windows-x64.exe
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
