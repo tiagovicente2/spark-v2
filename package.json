@@ -1,6 +1,6 @@
 {
   "name": "spark",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A self-hosted clone of Shopify's hosting platform named Spark",
   "main": "server/server.js",
   "bin": {
