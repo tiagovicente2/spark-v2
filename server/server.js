@@ -139,6 +139,15 @@ function getSiteContext(req) {
     return siteId;
   }
   
+  // 5. Check path route directly at root: /:siteId/...
+  const firstPathSegment = req.url.split('/')[1]?.split('?')[0];
+  if (firstPathSegment && !['_spark', 'install.sh', 'sites'].includes(firstPathSegment)) {
+    const sitePath = path.join(sitesDir, firstPathSegment);
+    if (fs.existsSync(sitePath)) {
+      return firstPathSegment;
+    }
+  }
+  
   return null;
 }
 
@@ -271,7 +280,7 @@ function getSiteUrls(req, siteId) {
     domainUrl = `${proto}://${siteId}-spark.localhost:${port}`;
   }
   
-  const pathUrl = `${proto}://${host}/sites/${siteId}/index.html`;
+  const pathUrl = `${proto}://${host}/${siteId}/`;
   
   return { domainUrl, pathUrl };
 }
@@ -665,6 +674,31 @@ app.use('/sites/:siteId', (req, res, next) => {
   
   // Serve the static file
   express.static(sitePath)(req, res, next);
+});
+
+// Serve sites directly under the root path, e.g., /site-name/...
+app.use('/:siteId', (req, res, next) => {
+  const { siteId } = req.params;
+  
+  // Skip reserved routes
+  const reserved = ['_spark', 'install.sh', 'sites'];
+  if (reserved.includes(siteId)) {
+    return next();
+  }
+  
+  const sitePath = path.join(sitesDir, siteId);
+  if (fs.existsSync(sitePath)) {
+    // Redirect if missing trailing slash to ensure relative paths resolve correctly
+    if (req.originalUrl.split('?')[0] === `/${siteId}`) {
+      const query = req.originalUrl.slice(siteId.length + 1); // keep query params
+      return res.redirect(301, `/${siteId}/${query}`);
+    }
+    
+    // Serve static files
+    return express.static(sitePath)(req, res, next);
+  }
+  
+  next();
 });
 
 // Root route handler

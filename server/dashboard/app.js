@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${site.fileCount} files</td>
         <td>${time}</td>
         <td>
-          <a href="${site.urlPath}" target="_blank" class="site-secondary-link">Path: /sites/${site.name}</a>
+          <a href="${site.urlPath}" target="_blank" class="site-secondary-link">Path: /${site.name}/</a>
         </td>
         <td class="actions-col">
           <div class="table-actions">

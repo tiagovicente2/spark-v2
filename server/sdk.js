@@ -19,6 +19,12 @@
       return match[1];
     }
     
+    // Fallback 2: check pathname for root-level direct path, e.g. /some-site/
+    const firstSegment = window.location.pathname.split('/')[1];
+    if (firstSegment && firstSegment !== '_spark' && firstSegment !== 'install.sh' && firstSegment !== 'sites') {
+      return firstSegment;
+    }
+    
     // Double fallback: query param or default
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('__spark_site')) {
