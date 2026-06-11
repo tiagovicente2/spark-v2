@@ -30,6 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupDbExplorer();
     
+    // Dynamic terminal live URL based on current environment
+    const terminalLiveUrl = document.getElementById('terminalLiveUrl');
+    if (terminalLiveUrl) {
+      const host = window.location.host;
+      const proto = window.location.protocol;
+      if (host.includes('localhost') || host.includes('127.0.0.1')) {
+        terminalLiveUrl.innerHTML = `✨ Site live! ${proto}//my-awesome-site.localhost:${window.location.port || '3000'}`;
+      } else {
+        // Strip out 'spark.' prefix if it exists to keep site URLs clean
+        const base = host.startsWith('spark.') ? host.slice(6) : host;
+        terminalLiveUrl.innerHTML = `✨ Site live! ${proto}//my-awesome-site-spark.${base}`;
+      }
+    }
+    
     // Auto-refresh metrics every 5 seconds
     setInterval(() => {
       if (activeTab === 'overview' || activeTab === 'sites') {
@@ -178,9 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const tr = document.createElement('tr');
       const time = new Date(site.deployedAt).toLocaleString();
       
+      let hostname = `${site.name}.localhost`;
+      try {
+        hostname = new URL(site.urlDomain).hostname;
+      } catch (e) {}
+      
       tr.innerHTML = `
         <td class="site-title-cell">
-          <a href="${site.urlDomain}" target="_blank">⚡ ${site.name}.localhost</a>
+          <a href="${site.urlDomain}" target="_blank">⚡ ${hostname}</a>
           <span class="site-secondary-link">${site.urlDomain}</span>
         </td>
         <td>${site.fileCount} files</td>
